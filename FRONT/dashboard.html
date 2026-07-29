@@ -7,44 +7,64 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="/gofarming/PUBLIC/manifest.json">
 </head>
-<body>
+<body class="dashboard-page">
 
-    <div class="header">
-        <div>
-            <div class="header-title">GoFarming</div>
-            <div class="muted" id="saudacao">Seu jardim</div>
+    
+<header class="header">
+    <div class="header-brand">
+        <img src="css/logo.png" alt="GoFarming" class="header-logo">
+        <div class="header-info">
+            
+            <div class="muted" id="saudacao">Olá, Jardineiro</div>
         </div>
-        <button onclick="sair()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:13px;">Sair</button>
     </div>
+    <button onclick="sair()" class="btn-sair">Sair</button>
+</header>
 
-    <div class="page">
+   
+    <main class="page">
+        
+        <div class="summary-card">
+            <div class="summary-title-row">
+                <h3>Seu Jardim</h3>
+                <svg class="icon-purple" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.4 19 2c1 2 2 4.1 2 7 0 6-4.5 11-10 11Z"/>
+                    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+                </svg>
+            </div>
+            <p>Acompanhe o status e regas das suas plantas</p>
+        </div>
+
+     
         <div id="lista" class="gap">
-            <div style="text-align:center; padding: 60px 0; color: var(--text-muted);">
-                <div class="spinner" style="margin: 0 auto 16px;"></div>
-                Carregando plantas...
+            <div class="empty-state">
+                <span>Carregando plantas...</span>
             </div>
         </div>
-    </div>
+    </main>
 
+    
     <nav class="bottom-nav">
         <a href="dashboard.html" class="nav-item ativo">
             <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
                 <polyline points="9 22 9 12 15 12 15 22"/>
             </svg>
-            Jardim
+            <span>Jardim</span>
         </a>
+
         <a href="scan.html" class="nav-scan">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
                 <circle cx="12" cy="13" r="4"/>
             </svg>
         </a>
+
         <a href="#" class="nav-item" onclick="sair()">
             <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
             </svg>
-            Sair
+            <span>Sair</span>
         </a>
     </nav>
 

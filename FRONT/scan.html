@@ -7,12 +7,21 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="/gofarming/PUBLIC/manifest.json">
     <style>
+        /* Variáveis de cores roxas para reativar os elementos do scanner */
+        :root {
+            --neon: #b490ff;
+            --neon-glow: rgba(180, 144, 255, 0.5);
+            --border: rgba(167, 139, 250, 0.25);
+            --text-muted: #8b8b9e;
+        }
+
         #camera-area {
             position: relative;
             width: 100%;
             aspect-ratio: 1;
             background: #0a0a0a;
             overflow: hidden;
+            border-radius: 20px;
         }
 
         #video {
@@ -81,6 +90,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 10;
         }
 
         #btn-captura::after {
@@ -89,6 +99,19 @@
             height: 50px;
             border-radius: 50%;
             background: var(--neon);
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(180, 144, 255, 0.2);
+            border-top-color: var(--neon);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         #resultado {

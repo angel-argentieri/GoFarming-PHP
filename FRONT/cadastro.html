@@ -7,17 +7,40 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="/gofarming/PUBLIC/manifest.json">
 </head>
-<body>
-    <div style="padding: 48px 28px 0;">
-        <a href="login.html" style="color: var(--neon); font-size: 14px; text-decoration: none;">← Voltar</a>
+<body class="auth-page">
 
-        <h2 style="margin: 24px 0 32px; font-size: 24px;">Criar conta</h2>
+    <div class="auth-card">
+       
+        <div class="auth-header">
+            <img src="css/logo.png" alt="GoFarming" class="auth-logo">
+            <h1 class="auth-title">Criar Conta</h1>
+            <p class="auth-subtitle">Junte-se ao GoFarming e cuide das suas plantas</p>
+        </div>
 
-        <div class="gap">
-            <input class="input" id="nome" type="text" placeholder="Nome">
-            <input class="input" id="email" type="email" placeholder="Email">
-            <input class="input" id="senha" type="password" placeholder="Senha">
+        
+        <div class="auth-form">
+            <div class="input-field">
+                <label for="nome">Nome</label>
+                <input class="input" id="nome" type="text" placeholder="Seu nome completo">
+            </div>
+
+            <div class="input-field">
+                <label for="email">E-mail</label>
+                <input class="input" id="email" type="email" placeholder="seu@email.com">
+            </div>
+
+            <div class="input-field">
+                <label for="senha">Senha</label>
+                <input class="input" id="senha" type="password" placeholder="••••••••">
+            </div>
+
             <button class="btn btn-primary" onclick="cadastrar()">Criar conta</button>
+
+           
+            <div class="auth-footer">
+                <span>Já tem uma conta?</span>
+                <a href="login.html">Entrar</a>
+            </div>
         </div>
     </div>
 

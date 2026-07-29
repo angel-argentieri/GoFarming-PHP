@@ -78,7 +78,7 @@ async function salvarNoJardim() {
     const res = await post('plantas', {
         nome: dadosPlanta.nome,
         especie: dadosPlanta.especie,
-        foto_url: null,
+        foto_url: 'data:image/jpeg;base64,' + dadosPlanta.foto_base64,
         frequencia_rega: dadosPlanta.frequencia_rega,
         access_token: dadosPlanta.access_token
     });
