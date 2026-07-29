@@ -112,18 +112,28 @@ class PlantaController {
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Api-Key: ' . PLANT_ID_KEY,
+            'Api-Key: ' . (defined('PLANT_ID_KEY') ? PLANT_ID_KEY : ''),
             'Content-Type: application/json'
         ]);
 
+        // FIX PARA XAMPP/WINDOWS: Ignora verificação estrita de SSL
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
         $resposta = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            // Se o cURL falhar, retorna o erro do cURL para debugar
+            return ['error' => curl_error($ch)];
+        }
+
         curl_close($ch);
 
         return json_decode($resposta, true);
     }
 
     private function perguntarGemini($especie) {
-        if (!GEMINI_KEY) {
+        if (!defined('GEMINI_KEY') || !GEMINI_KEY) {
             return 'Frequência não disponível (chave Gemini não configurada)';
         }
 
@@ -141,6 +151,10 @@ class PlantaController {
         curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
 
+       
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
         $resposta = curl_exec($ch);
         curl_close($ch);
 
@@ -149,10 +163,10 @@ class PlantaController {
     }
 
     private function extrairNumeroFrequencia($texto) {
-        // Tenta pegar o primeiro número da string
+        
         preg_match('/\d+/', $texto, $matches);
         $numero = isset($matches[0]) ? (int)$matches[0] : 2;
-        // Mantém entre 1 e 7
+        
         if ($numero < 1) $numero = 1;
         if ($numero > 7) $numero = 7;
         return $numero;
