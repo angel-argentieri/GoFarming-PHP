@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar conta — GoFarming</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="/gofarming/PUBLIC/manifest.json">
+</head>
+<body>
+    <div style="padding: 48px 28px 0;">
+        <a href="login.html" style="color: var(--neon); font-size: 14px; text-decoration: none;">← Voltar</a>
+
+        <h2 style="margin: 24px 0 32px; font-size: 24px;">Criar conta</h2>
+
+        <div class="gap">
+            <input class="input" id="nome" type="text" placeholder="Nome">
+            <input class="input" id="email" type="email" placeholder="Email">
+            <input class="input" id="senha" type="password" placeholder="Senha">
+            <button class="btn btn-primary" onclick="cadastrar()">Criar conta</button>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

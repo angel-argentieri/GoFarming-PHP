@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jardim — GoFarming</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="/gofarming/PUBLIC/manifest.json">
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <div class="header-title">GoFarming</div>
+            <div class="muted" id="saudacao">Seu jardim</div>
+        </div>
+        <button onclick="sair()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:13px;">Sair</button>
+    </div>
+
+    <div class="page">
+        <div id="lista" class="gap">
+            <div style="text-align:center; padding: 60px 0; color: var(--text-muted);">
+                <div class="spinner" style="margin: 0 auto 16px;"></div>
+                Carregando plantas...
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item ativo">
+            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Jardim
+        </a>
+        <a href="scan.html" class="nav-scan">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+            </svg>
+        </a>
+        <a href="#" class="nav-item" onclick="sair()">
+            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+            </svg>
+            Sair
+        </a>
+    </nav>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
