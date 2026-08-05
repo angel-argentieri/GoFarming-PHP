@@ -39,3 +39,12 @@ function toast(msg) {
     t.classList.add('visivel');
     setTimeout(() => t.classList.remove('visivel'), 2500);
 }
+
+// --- Registro do Service Worker (PWA) ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register(BASE + '/service-worker.js')
+            .then(reg => console.log('Service Worker ativo no escopo:', reg.scope))
+            .catch(err => console.error('Erro ao registrar Service Worker:', err));
+    });
+}

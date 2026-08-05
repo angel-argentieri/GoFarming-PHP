@@ -29,3 +29,4 @@ CREATE TABLE Regas (
     status ENUM('pendente', 'concluida') DEFAULT 'pendente',
     FOREIGN KEY (id_planta) REFERENCES Plantas(id) ON DELETE CASCADE
 );
+

@@ -1,7 +1,7 @@
 <?php
 
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 
 header('Content-Type: application/json; charset=UTF-8');
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
@@ -70,6 +70,12 @@ try {
         case 'identificar':
             if ($method === 'POST') {
                 (new PlantaController($db))->identificar();
+            }
+            break;
+
+        case 'obter-cuidados':
+            if ($method === 'POST') {
+                (new IAController($db))->obterCuidados();
             }
             break;
 

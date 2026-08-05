@@ -1,11 +1,12 @@
 <?php
 
-require_once dirname(__DIR__) . '/MODEL/PlantaModel.php';
-require_once dirname(__DIR__) . '/VIEW/JsonView.php';
+require_once __DIR__ . '/../MODEL/PlantaModel.php';
+require_once __DIR__ . '/../VIEW/JsonView.php';
 
 class IAController {
     private $modelPlanta;
     private $view;
+    private $apiKey = 'AQ.Ab8RN6I8SvLckAyFwOspm-41RiT0tGYVTqhrBAEyH4DedT2Fmw';
 
     public function __construct($db) {
         $this->modelPlanta = new PlantaModel($db);
@@ -15,18 +16,16 @@ class IAController {
     public function chat() {
         $data = json_decode(file_get_contents('php://input'), true);
 
-        if (!isset($data['id_planta']) || !isset($data['pergunta'])) {
+        if (empty($data['id_planta']) || empty($data['pergunta'])) {
             $this->view->send(['error' => 'Dados incompletos.'], 400);
+            return;
         }
 
         $planta = $this->modelPlanta->buscarPorId($data['id_planta']);
 
         if (!$planta) {
             $this->view->send(['error' => 'Planta não encontrada.'], 404);
-        }
-
-        if (!GEMINI_KEY) {
-            $this->view->send(['error' => 'Chave Gemini não configurada.'], 500);
+            return;
         }
 
         $contexto = <<<EOD
@@ -52,27 +51,99 @@ Seu objetivo é guiar o usuário com orientações práticas, seguras e fáceis 
    - Não use emojis.
 EOD;
 
-        $body = json_encode([
+        $body = [
             'contents' => [
-                ['role' => 'user', 'parts' => [['text' => $contexto]]],
-                ['role' => 'user', 'parts' => [['text' => $data['pergunta']]]]
+                [
+                    'role' => 'user',
+                    'parts' => [
+                        ['text' => $contexto . "\n\n--- PERGUNTA DO USUÁRIO ---\n" . $data['pergunta']]
+                    ]
+                ]
             ]
-        ]);
+        ];
 
-        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . GEMINI_KEY;
+        $resultado = $this->executarCurlGemini($body);
+
+        if (isset($resultado['error'])) {
+            $this->view->send(['error' => $resultado['error']], 500);
+            return;
+        }
+
+        $this->view->send(['resposta' => $resultado['texto']]);
+    }
+
+    public function obterCuidados() {
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        if (empty($data['nome_planta'])) {
+            $this->view->send(['error' => 'Nome da planta não informado.'], 400);
+            return;
+        }
+
+        $prompt = "Forneça as informações de cultivo para a planta '{$data['nome_planta']}'. "
+            . "Retorne estritamente um JSON com este formato: "
+            . "{\"frequencia_rega\": \"A cada X dias\"}. "
+            . "Sem formatação markdown e sem texto adicional.";
+
+        $body = [
+            'contents' => [
+                [
+                    'parts' => [
+                        ['text' => $prompt]
+                    ]
+                ]
+            ]
+        ];
+
+        $resultado = $this->executarCurlGemini($body);
+
+        if (isset($resultado['texto'])) {
+            $jsonLimpo = trim(str_replace(['```json', '```'], '', $resultado['texto']));
+            $dadosCuidados = json_decode($jsonLimpo, true);
+
+            if (!empty($dadosCuidados['frequencia_rega'])) {
+                $this->view->send($dadosCuidados);
+                return;
+            }
+        }
+
+        $this->view->send(['frequencia_rega' => 'A cada 2 a 3 dias']);
+    }
+
+    private function executarCurlGemini($body) {
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . $this->apiKey;
 
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+            CURLOPT_POSTFIELDS     => json_encode($body),
+            CURLOPT_TIMEOUT        => 20,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false
+        ]);
 
         $resposta = curl_exec($ch);
+        $curlError = curl_error($ch);
         curl_close($ch);
 
-        $json = json_decode($resposta, true);
-        $texto = $json['candidates'][0]['content']['parts'][0]['text'] ?? 'Não consegui responder agora.';
+        if ($curlError) {
+            return ['error' => 'Erro de conexão cURL: ' . $curlError];
+        }
 
-        $this->view->send(['resposta' => $texto]);
+        $json = json_decode($resposta, true);
+
+        if (isset($json['error']['message'])) {
+            return ['error' => 'Erro Google API: ' . $json['error']['message']];
+        }
+
+        $texto = $json['candidates'][0]['content']['parts'][0]['text'] ?? null;
+
+        if (!$texto) {
+            return ['error' => 'Sem resposta de texto do modelo.'];
+        }
+
+        return ['texto' => $texto];
     }
 }

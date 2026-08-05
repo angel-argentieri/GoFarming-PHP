@@ -30,7 +30,14 @@ function capturar() {
     analisar();
 }
 
+function selecionarArquivo(e) {
+    if (e.target.files && e.target.files[0]) {
+        processarArquivo(e.target.files[0]);
+    }
+}
+
 function processarArquivo(file) {
+    if (!file) return;
     const reader = new FileReader();
     reader.onload = e => {
         fotoBase64 = e.target.result.split(',')[1];
@@ -43,6 +50,10 @@ function processarArquivo(file) {
 function mostrarPreview(src) {
     document.getElementById('laser').style.display = 'none';
     document.getElementById('btn-captura').style.display = 'none';
+    
+    const btnGaleria = document.getElementById('btn-galeria');
+    if (btnGaleria) btnGaleria.style.display = 'none';
+
     document.getElementById('video').style.display = 'none';
     const preview = document.getElementById('preview');
     preview.src = src;
@@ -100,4 +111,7 @@ function reiniciar() {
     document.getElementById('video').style.display = 'block';
     document.getElementById('laser').style.display = 'block';
     document.getElementById('btn-captura').style.display = 'flex';
+
+    const btnGaleria = document.getElementById('btn-galeria');
+    if (btnGaleria) btnGaleria.style.display = 'flex';
 }

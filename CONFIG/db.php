@@ -1,7 +1,7 @@
 <?php
 
 define('PLANT_ID_KEY', '3qPbDUmVBuoXULHJyHHIX1jrN4TnxPciutckYp8oLuR4TTmhVG');
-define('GEMINI_KEY', '');
+define('GEMINI_KEY', 'AQ.Ab8RN6I8SvLckAyFwOspm-41RiT0tGYVTqhrBAEyH4DedT2Fmw');
 
 class Database {
     private $host = 'localhost';
