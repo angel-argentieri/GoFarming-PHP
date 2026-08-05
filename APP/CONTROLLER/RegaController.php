@@ -17,9 +17,17 @@ class RegaController {
 
         if (!isset($data['id_rega'])) {
             $this->view->send(['error' => 'ID da rega não informado.'], 400);
+            return;
         }
 
-        $this->model->marcarComoRegada($data['id_rega']);
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $id_usuario = $_SESSION['id_usuario'] ?? null;
+
+        $ok = $this->model->marcarComoRegada($data['id_rega'], $id_usuario);
+        if (!$ok) {
+            $this->view->send(['error' => 'Rega não encontrada ou não pertence a você.'], 404);
+            return;
+        }
         $this->view->send(['message' => 'Rega registrada!']);
     }
 }

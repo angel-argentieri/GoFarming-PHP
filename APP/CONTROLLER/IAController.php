@@ -6,7 +6,6 @@ require_once __DIR__ . '/../VIEW/JsonView.php';
 class IAController {
     private $modelPlanta;
     private $view;
-    private $apiKey = 'AQ.Ab8RN6I8SvLckAyFwOspm-41RiT0tGYVTqhrBAEyH4DedT2Fmw';
 
     public function __construct($db) {
         $this->modelPlanta = new PlantaModel($db);
@@ -21,7 +20,10 @@ class IAController {
             return;
         }
 
-        $planta = $this->modelPlanta->buscarPorId($data['id_planta']);
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $id_usuario = $_SESSION['id_usuario'] ?? null;
+
+        $planta = $this->modelPlanta->buscarPorIdEUsuario($data['id_planta'], $id_usuario);
 
         if (!$planta) {
             $this->view->send(['error' => 'Planta não encontrada.'], 404);
@@ -111,7 +113,12 @@ EOD;
     }
 
     private function executarCurlGemini($body) {
-        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . $this->apiKey;
+        $apiKey = defined('GEMINI_KEY') ? GEMINI_KEY : '';
+        if (empty($apiKey)) {
+            return ['error' => 'Chave Gemini não configurada.'];
+        }
+
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . $apiKey;
 
         $ch = curl_init($url);
         curl_setopt_array($ch, [

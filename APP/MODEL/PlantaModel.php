@@ -45,6 +45,14 @@ class PlantaModel {
         return $this->db->lastInsertId();
     }
 
+    public function buscarPorIdEUsuario($id, $id_usuario) {
+        $stmt = $this->db->prepare("SELECT * FROM Plantas WHERE id = :id AND id_usuario = :id_usuario");
+        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':id_usuario', $id_usuario);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
     public function deletar($id) {
         $stmt = $this->db->prepare("DELETE FROM Plantas WHERE id = :id");
         $stmt->bindValue(':id', $id);

@@ -1,7 +1,20 @@
 <?php
 
-define('PLANT_ID_KEY', '3qPbDUmVBuoXULHJyHHIX1jrN4TnxPciutckYp8oLuR4TTmhVG');
-define('GEMINI_KEY', 'AQ.Ab8RN6I8SvLckAyFwOspm-41RiT0tGYVTqhrBAEyH4DedT2Fmw');
+$envFile = dirname(__DIR__) . '/.env';
+if (file_exists($envFile)) {
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue;
+        if (strpos($line, '=') === false) continue;
+        [$key, $value] = explode('=', $line, 2);
+        if (!getenv(trim($key))) {
+            putenv(trim($key) . '=' . trim($value));
+        }
+    }
+}
+
+define('PLANT_ID_KEY', getenv('PLANT_ID_KEY') ?: '3qPbDUmVBuoXULHJyHHIX1jrN4TnxPciutckYp8oLuR4TTmhVG');
+define('GEMINI_KEY', getenv('GEMINI_KEY') ?: 'AQ.Ab8RN6I8SvLckAyFwOspm-41RiT0tGYVTqhrBAEyH4DedT2Fmw');
 
 class Database {
     private $host = 'localhost';

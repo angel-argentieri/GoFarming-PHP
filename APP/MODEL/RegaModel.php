@@ -8,7 +8,6 @@ class RegaModel {
     }
 
     public function criarProximasRegas($id_planta, $frequencia_por_semana) {
-        // Gera regas pra próximos 30 dias com base na frequência semanal
         $intervalo = round(7 / $frequencia_por_semana);
         $data = new DateTime();
 
@@ -25,17 +24,21 @@ class RegaModel {
         }
     }
 
-    public function marcarComoRegada($id_rega) {
+    public function marcarComoRegada($id_rega, $id_usuario) {
         $stmt = $this->db->prepare("
-            UPDATE Regas SET status = 'concluida', data_regada = NOW()
-            WHERE id = :id
+            UPDATE Regas r
+            JOIN Plantas p ON p.id = r.id_planta
+            SET r.status = 'concluida', r.data_regada = NOW()
+            WHERE r.id = :id_rega
+            AND p.id_usuario = :id_usuario
         ");
-        $stmt->bindValue(':id', $id_rega);
-        return $stmt->execute();
+        $stmt->bindValue(':id_rega', $id_rega);
+        $stmt->bindValue(':id_usuario', $id_usuario);
+        $stmt->execute();
+        return $stmt->rowCount() > 0;
     }
 
     public function buscarPendentesHoje() {
-        // Usada pelo cron às 20h
         $stmt = $this->db->prepare("
             SELECT r.id, r.id_planta, p.nome AS nome_planta, u.email, u.nome AS nome_usuario
             FROM Regas r
