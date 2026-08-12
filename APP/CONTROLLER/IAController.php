@@ -28,37 +28,17 @@ class IAController {
             return;
         }
 
-        $contexto = <<<EOD
-Você é o assistente virtual especialista em botânica e jardinagem do aplicativo GoFarming.
-Seu objetivo é guiar o usuário com orientações práticas, seguras e fáceis de entender sobre o cultivo de plantas.
-
---- DADOS DA PLANTA ATUAL ---
-• Nome popular: {$planta['nome']}
-• Nome científico/Espécie: {$planta['especie']}
-
---- DIRETRIZES DE RESPOSTA ---
-1. PERSONA E TOM:
-   - Responda como um botânico amigável, encorajador e altamente capacitado.
-   - Use português do Brasil claro, acessível para iniciantes e direto ao ponto.
-
-2. CONTEÚDO E CONHECIMENTO:
-   - Mantenha o foco estritamente em jardinagem, cultivo e saúde vegetal.
-   - Sempre que o usuário perguntar sobre cuidados, aborde (conforme necessário): iluminação ideal (sol direto, meia-sombra, luz indireta), frequência de rega, tipo de solo/substrato, adubação e sinais de pragas ou doenças.
-
-3. FORMATAÇÃO (UI/UX):
-   - Formate a resposta usando Markdown limpo (use negritos para termos importantes e marcadores • para listas).
-   - Mantenha parágrafos curtos para facilitar a leitura na tela do celular.
-   - Não use emojis.
-EOD;
+        $perguntaCompleta = "Você é um especialista em jardinagem. "
+            . "A planta é {$planta['nome']} ({$planta['especie']}). "
+            . "Responda em português de forma direta e curta: {$data['pergunta']}";
 
         $body = [
             'contents' => [
-                [
-                    'role' => 'user',
-                    'parts' => [
-                        ['text' => $contexto . "\n\n--- PERGUNTA DO USUÁRIO ---\n" . $data['pergunta']]
-                    ]
-                ]
+                ['parts' => [['text' => $perguntaCompleta]]]
+            ],
+            'generationConfig' => [
+                'temperature' => 0.7,
+                'maxOutputTokens' => 500
             ]
         ];
 
@@ -80,18 +60,11 @@ EOD;
             return;
         }
 
-        $prompt = "Forneça as informações de cultivo para a planta '{$data['nome_planta']}'. "
-            . "Retorne estritamente um JSON com este formato: "
-            . "{\"frequencia_rega\": \"A cada X dias\"}. "
-            . "Sem formatação markdown e sem texto adicional.";
+        $prompt = "Responda com um JSON: {\"frequencia_rega\": \"A cada X dias\"}. Planta: {$data['nome_planta']}";
 
         $body = [
             'contents' => [
-                [
-                    'parts' => [
-                        ['text' => $prompt]
-                    ]
-                ]
+                ['parts' => [['text' => $prompt]]]
             ]
         ];
 
@@ -111,7 +84,7 @@ EOD;
     }
 
     private function executarCurlGemini($body) {
-        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . $this->apiKey;
+        $url = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=' . $this->apiKey;
 
         $ch = curl_init($url);
         curl_setopt_array($ch, [
@@ -119,7 +92,7 @@ EOD;
             CURLOPT_POST           => true,
             CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
             CURLOPT_POSTFIELDS     => json_encode($body),
-            CURLOPT_TIMEOUT        => 20,
+            CURLOPT_TIMEOUT        => 30,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false
         ]);
@@ -134,16 +107,39 @@ EOD;
 
         $json = json_decode($resposta, true);
 
+        if (!is_array($json)) {
+            return ['error' => 'Resposta inválida da API.'];
+        }
+
         if (isset($json['error']['message'])) {
             return ['error' => 'Erro Google API: ' . $json['error']['message']];
         }
 
-        $texto = $json['candidates'][0]['content']['parts'][0]['text'] ?? null;
+        if (empty($json['candidates'])) {
+            if (!empty($json['promptFeedback']['blockReason'])) {
+                return ['error' => 'Resposta bloqueada por segurança.'];
+            }
+            return ['error' => 'Sem resposta do modelo.'];
+        }
 
-        if (!$texto) {
+        $finishReason = $json['candidates'][0]['finishReason'] ?? '';
+
+        if ($finishReason === 'SAFETY') {
+            return ['error' => 'Resposta bloqueada por segurança.'];
+        }
+
+        $texto = '';
+        $parts = $json['candidates'][0]['content']['parts'] ?? [];
+        foreach ($parts as $part) {
+            if (isset($part['text'])) {
+                $texto .= $part['text'];
+            }
+        }
+
+        if (empty(trim($texto))) {
             return ['error' => 'Sem resposta de texto do modelo.'];
         }
 
-        return ['texto' => $texto];
+        return ['texto' => trim($texto)];
     }
 }

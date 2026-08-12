@@ -169,7 +169,7 @@ class PlantaController {
             'contents' => [['parts' => [['text' => $pergunta]]]]
         ]);
 
-        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . GEMINI_KEY;
+        $url = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=' . GEMINI_KEY;
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
